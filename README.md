@@ -1,8 +1,3 @@
-login testovich
-pass Golovolomka!
-
-Sendgrid
-pass Golovolomkagolovolomka
 
 
 
