@@ -32,3 +32,15 @@ module.exports.forbidden = (middleware) => {
     }
   };
 };
+
+module.exports.catchVerifyErrors = (middleware) => {
+  return async (req, res) => {
+    try {
+      await middleware(req, res);
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ message: "Verification has already been passed" });
+    }
+  };
+};

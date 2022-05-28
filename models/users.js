@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const Jimp = require("jimp");
 const fs = require("fs").promises;
+const sgMail = require("@sendgrid/mail");
+const uuid = require("uuid");
 
 const register = async (body) => {
   const { email, password, subscription } = body;
@@ -23,13 +25,33 @@ const register = async (body) => {
       },
       true
     ),
+    verificationToken: uuid.v4(),
   });
+
+  const verificationToken = uuid.v4();
+
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  const msg = {
+    to: email,
+    from: "linna2230@ukr.net",
+    subject: "Sending verification email",
+    text: `http://localhost:3000/api/users/verify/${verificationToken}`,
+    html: `<p>verification for your email. <a href="http://localhost:3000/api/users/verify/${verificationToken}">press to link</a></p>`,
+  };
+  sgMail
+    .send(msg)
+    .then(() => {
+      console.log("Email sent");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   return newUser;
 };
 
 const login = async (body) => {
   const { email, password } = body;
-  let user = await Users.findOne({ email });
+  let user = await Users.findOne({ email, verify: true });
 
   const isPassCorrect = await bcryptjs.compare(password, user.password);
   if (isPassCorrect) {
@@ -69,10 +91,50 @@ const avatarsUpdate = async (token, body) => {
   return user;
 };
 
+const verificationUser = async (verificationToken) => {
+  const user = await Users.findOneAndUpdate(
+    verificationToken,
+    { verificationToken: null, verify: true },
+    { new: true }
+  );
+  return user;
+};
+
+const verificationSecondUser = async (body) => {
+  const { email } = body;
+  const user = await Users.findOne({ email });
+  if (!user.verify) {
+    const verificationToken = uuid.v4();
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+      to: email,
+      from: "linna2230@ukr.net",
+      subject: "Sending verification email",
+      text: `http://localhost:3000/api/users/verify/${verificationToken}`,
+      html: `<p>verification for your email. <a href="http://localhost:3000/api/users/verify/${verificationToken}">press to link</a></p>`,
+    };
+
+    return await sgMail
+      .send(msg)
+      .then(() => {
+        console.log("Email sent");
+        return true;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  } else {
+    return false;
+  }
+};
+
 module.exports = {
   register,
   login,
   logout,
   currentUser,
   avatarsUpdate,
+  verificationUser,
+  verificationSecondUser,
 };

@@ -7,6 +7,7 @@ const {
   catchErrors,
   conflict,
   forbidden,
+  catchVerifyErrors,
 } = require("../../middlewares/catch-errors");
 
 const {
@@ -15,6 +16,8 @@ const {
   logout,
   currentUser,
   avatarsUpdate,
+  verificationUser,
+  verificationSecondUser,
 } = require("../../models/users");
 const { userRegLoginValidation } = require("../../middlewares/validMiddleware");
 const authorize = require("../../middlewares/authorization");
@@ -92,6 +95,27 @@ router.patch(
       contentType: "application/json",
       ResponseBody: { avatarURL },
     });
+  })
+);
+
+router.get(
+  "/verify/:verificationToken",
+  catchErrors(async (req, res, next) => {
+    const user = await verificationUser(req.params.verificationToken);
+    res.status(200).json({ message: "Verification successful", user });
+  })
+);
+
+router.post(
+  "/verify/",
+  catchVerifyErrors(async (req, res, next) => {
+    const result = await verificationSecondUser(req.body);
+
+    if (result) {
+      res.status(200).json({ message: "Verification email send" });
+    } else {
+      res.status(400).json({ message: "Verification has already been passed" });
+    }
   })
 );
 
