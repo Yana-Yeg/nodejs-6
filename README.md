@@ -1,10 +1,5 @@
-login testovich
-pass Golovolomka!
 
-Sendgrid
-pass Golovolomkagolovolomka
 
-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
 
 ### Команды:
 
