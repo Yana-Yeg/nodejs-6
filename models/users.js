@@ -15,7 +15,6 @@ const register = async (body) => {
     email,
     password: await bcryptjs.hash(password, +process.env.BCRYPTJS_SALT),
     subscription,
-
     avatarURL: gravatar.url(
       email,
       {
@@ -33,7 +32,7 @@ const register = async (body) => {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const msg = {
     to: email,
-    from: "linna2230@ukr.net",
+    from: "yanayeg@gmail.com",
     subject: "Sending verification email",
     text: `http://localhost:3000/api/users/verify/${verificationToken}`,
     html: `<p>verification for your email. <a href="http://localhost:3000/api/users/verify/${verificationToken}">press to link</a></p>`,
@@ -109,7 +108,7 @@ const verificationSecondUser = async (body) => {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
       to: email,
-      from: "linna2230@ukr.net",
+      from: "yanayeg@gmail.com",
       subject: "Sending verification email",
       text: `http://localhost:3000/api/users/verify/${verificationToken}`,
       html: `<p>verification for your email. <a href="http://localhost:3000/api/users/verify/${verificationToken}">press to link here</a></p>`,
