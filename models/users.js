@@ -112,7 +112,7 @@ const verificationSecondUser = async (body) => {
       from: "linna2230@ukr.net",
       subject: "Sending verification email",
       text: `http://localhost:3000/api/users/verify/${verificationToken}`,
-      html: `<p>verification for your email. <a href="http://localhost:3000/api/users/verify/${verificationToken}">press to link</a></p>`,
+      html: `<p>verification for your email. <a href="http://localhost:3000/api/users/verify/${verificationToken}">press to link here</a></p>`,
     };
 
     return await sgMail
